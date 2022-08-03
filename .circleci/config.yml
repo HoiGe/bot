@@ -46,5 +46,5 @@ jobs:
       - run: gradle test
       
       - store_artifacts:
-          path: /build/mirai
+          path: build/mirai
           destination: bot
