@@ -11,3 +11,6 @@ object EnableGroup : AutoSavePluginConfig("config") {
     val enableGroups: MutableList<Long> by value()
     val activeAdmin: MutableList<Long> by value()
 }
+object Error : AutoSavePluginConfig("error_dump") {
+    val error: MutableMap<String, String> by value()
+}

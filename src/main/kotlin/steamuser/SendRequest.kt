@@ -3,18 +3,16 @@ package com.pkgho.hoige.bot.steamuser
 import com.beust.klaxon.*
 import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.coroutines.awaitStringResponseResult
-import com.github.kittinunf.fuel.httpGet
-import com.github.kittinunf.result.Result
 import com.pkgho.hoige.bot.steamuser.SteamIDs.ids
 import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.event.events.GroupMessageEvent
 
 
-class SendRequest() {
+class SendRequest {
     //PersonState 0-离线 1-在线 3-离开
     suspend fun jsonHandler(group: GroupMessageEvent) {
-        var count : Int = 0
-        ids.forEach() { it ->
+        var count = 0
+        ids.forEach {
             if (it.key == group.group.id) {
                 if (it.key == group.group.id) {
                     val steamID = it.value
@@ -31,9 +29,9 @@ class SendRequest() {
 
     private suspend fun main(steamID:String, group: GroupMessageEvent) {
         runBlocking {
-            val (request, response, result) = Fuel.get("https://api.pkgho.com/steam/?uid=${steamID}")
+            val (_, _, result) = Fuel.get("https://api.pkgho.com/steam/?uid=${steamID}")
                 .awaitStringResponseResult()
-            val (bytes, error) = result
+            val (bytes, _) = result
             val parser: Parser = Parser.default()
             val stringBuilder: StringBuilder = StringBuilder(bytes.toString())
             val json: JsonObject = parser.parse(stringBuilder) as JsonObject

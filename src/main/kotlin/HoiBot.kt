@@ -8,8 +8,6 @@ import kotlinx.coroutines.*
 import net.mamoe.mirai.BotFactory
 import net.mamoe.mirai.console.plugin.jvm.JvmPluginDescription
 import net.mamoe.mirai.console.plugin.jvm.KotlinPlugin
-import net.mamoe.mirai.contact.Group
-import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.utils.BotConfiguration
 import net.mamoe.mirai.utils.info
 
@@ -32,7 +30,7 @@ object HoiBot : KotlinPlugin(
     override fun onEnable() {
         setup()
         logger.info { "Plugin loaded" }
-        val async = GlobalScope.async {
+        GlobalScope.async {
             vot.login()
             CommandRegister().commandManager()
             ExistChecker.quitRemove()
