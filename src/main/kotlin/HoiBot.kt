@@ -74,7 +74,7 @@ object HoiBot : KotlinPlugin(
                                     code++
                                     if (code == cache.size) {
                                         if (map.value != resultString) {
-                                            cache[(0 + 1 until Food.food.size).random()] = resultString
+                                            cache[(1 until Food.food.size).random()] = resultString
                                             FoodCache.save()
                                             FoodCache.reload()
                                             cache.forEach { point ->
@@ -90,6 +90,7 @@ object HoiBot : KotlinPlugin(
                         } catch (e: Exception) {
                             it.group.sendMessage("错误:输入的值不可用")
                             logger.error(e)
+                            return@subscribeAlways
                         }
                     }
                 }
