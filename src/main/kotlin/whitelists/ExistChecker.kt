@@ -3,7 +3,6 @@ package com.pkgho.hoige.bot.whitelists
 import com.pkgho.hoige.bot.HoiBot
 import com.pkgho.hoige.bot.HoiBot.reload
 import com.pkgho.hoige.bot.HoiBot.save
-import com.pkgho.hoige.bot.HoiBot.vot
 import com.pkgho.hoige.bot.whitelists.Config.whiteList
 import com.pkgho.hoige.bot.whitelists.Error.error
 import com.pkgho.hoige.bot.whitelists.EnableGroup.enableGroups
@@ -50,7 +49,7 @@ object ExistChecker {
         }
     }
 
-    suspend fun quitRemove() {
+    fun quitRemove() {
         GlobalEventChannel
             .filterIsInstance<MemberLeaveEvent>()
             .filter { enableGroups.contains(it.group.id) }
@@ -63,7 +62,6 @@ object ExistChecker {
                             RconSender.remList(key = it.value)
                         }catch (e:Exception){
                             HoiBot.logger.error { "[WHL]玩家${it.value}(${this.member.id})的退群(${this.group.name})处理失败" }
-                            vot.getFriend(2402210783)?.sendMessage("[WHL]玩家${it.value}(${this.member.id})的退群(${this.group.name})删除失败")
                             error[it.value] = "DEL"
                             code = 1
                         }
