@@ -47,6 +47,7 @@ object HoiBot : KotlinPlugin(
                 val matchedText = text.containsMatchIn(input = it.message.contentToString())
                 val resultString = rule.replace(it.message.contentToString(),"")
                 if (matchedSharp && matchedText){
+                    println(resultString)
                     if (time == "0000"){
                         cache.clear()
                         FoodCache.save()
@@ -54,26 +55,31 @@ object HoiBot : KotlinPlugin(
                         HoiBot.logger.info { "[HoiFood]已清空用户缓存" }
                     }else{
                         //map.value 为用户名 map.key 为数值
+                        try {
                             cache.forEach { map ->
-                                    if (resultString == map.value && resultString != "") {
-                                        it.group.sendMessage("${map.value}今天吃${Food.food[map.key]}")
-                                    }else {
-                                        code++
-                                        if (code == cache.size) {
-                                            if(map.value != resultString){
-                                                cache[(0 until Food.food.size).random()] = resultString
-                                                FoodCache.save()
-                                                FoodCache.reload()
-                                                cache.forEach { point ->
-                                                    if (resultString == point.value) {
-                                                        it.group.sendMessage("${point.value}今天吃${Food.food[point.key]}")
-                                                        code = 0
-                                                    }
+                                if (resultString == map.value && resultString != "null") {
+                                    it.group.sendMessage("${map.value}今天吃${Food.food[map.key]}")
+                                } else {
+                                    code++
+                                    if (code == cache.size) {
+                                        if (map.value != resultString && resultString != "null") {
+                                            cache[(0 + 1  until  Food.food.size).random()] = resultString
+                                            FoodCache.save()
+                                            FoodCache.reload()
+                                            cache.forEach { point ->
+                                                if (resultString == point.value) {
+                                                    it.group.sendMessage("${point.value}今天吃${Food.food[point.key]}")
+
                                                 }
                                             }
                                         }
+                                        code = 0
                                     }
+                                }
                             }
+                        }catch (e:Exception){
+                            it.group.sendMessage("错误:输入的值不可用")
+                        }
                     }
                 }
 //                val wolfd = wolf.containsMatchIn(input = it.message.contentToString())
