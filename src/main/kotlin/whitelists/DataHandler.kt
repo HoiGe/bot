@@ -1,5 +1,6 @@
 package com.pkgho.hoige.bot.whitelists
 
+import io.ktor.util.*
 import net.mamoe.mirai.console.data.AutoSavePluginConfig
 import net.mamoe.mirai.console.data.AutoSavePluginData
 import net.mamoe.mirai.console.data.value
@@ -18,4 +19,9 @@ object Error : AutoSavePluginConfig("error_dump") {
 
 object FoodCache : AutoSavePluginData("food_cache") {
     val cache: MutableMap<Int, String> by value()
+}
+
+object TimeCache : AutoSavePluginData("time_cache"){
+    var time: Int by value()
+    val delay: Int by value()
 }

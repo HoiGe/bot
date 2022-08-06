@@ -4,10 +4,7 @@ import com.pkgho.hoige.bot.HoiBot.reload
 import com.pkgho.hoige.bot.HoiBot.save
 import com.pkgho.hoige.bot.steamuser.SteamIDs
 import com.pkgho.hoige.bot.steamuser.Food
-import com.pkgho.hoige.bot.whitelists.Config
-import com.pkgho.hoige.bot.whitelists.EnableGroup
-import com.pkgho.hoige.bot.whitelists.Error
-import com.pkgho.hoige.bot.whitelists.FoodCache
+import com.pkgho.hoige.bot.whitelists.*
 
 object DataSettings {
     fun setup(){
@@ -16,7 +13,7 @@ object DataSettings {
         Config.reload()
         EnableGroup.reload()
         SteamIDs.reload()
-
+        TimeCache.reload()
         FoodCache.cache[1] = "goat"
         FoodCache.save()
         FoodCache.reload()
@@ -24,6 +21,7 @@ object DataSettings {
 
     fun close(){
         FoodCache.cache.clear()
+        TimeCache.save()
         FoodCache.save()
         Food.save()
         Config.save()
@@ -31,6 +29,7 @@ object DataSettings {
         SteamIDs.save()
         EnableGroup.save()
         FoodCache.reload()
+        TimeCache.reload()
         EnableGroup.reload()
         SteamIDs.reload()
         Error.reload()

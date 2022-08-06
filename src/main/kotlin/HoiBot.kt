@@ -7,6 +7,7 @@ import com.pkgho.hoige.bot.whitelists.EnableGroup
 import com.pkgho.hoige.bot.whitelists.ExistChecker
 import com.pkgho.hoige.bot.whitelists.FoodCache
 import com.pkgho.hoige.bot.whitelists.FoodCache.cache
+import com.pkgho.hoige.bot.whitelists.TimeCache
 import kotlinx.coroutines.*
 import net.mamoe.mirai.console.plugin.jvm.JvmPluginDescription
 import net.mamoe.mirai.console.plugin.jvm.KotlinPlugin
@@ -28,12 +29,19 @@ object HoiBot : KotlinPlugin(
     override fun onEnable() {
         setup()
         val currentDateTime = LocalDateTime.now()
-        val time = currentDateTime.format(DateTimeFormatter.ofPattern("HHmm"))
+        val time = currentDateTime.format(DateTimeFormatter.ofPattern("HHmmss"))
         var code = 0
         logger.info { "Plugin loaded" }
         GlobalScope.async {
             CommandRegister().commandManager()
             ExistChecker.quitRemove()
+            if (time == "000000"){
+                cache.clear()
+                cache[1] = "goat"
+                FoodCache.save()
+                FoodCache.reload()
+            }
+
         }
         GlobalEventChannel
             .filterIsInstance<GroupMessageEvent>()
@@ -46,30 +54,32 @@ object HoiBot : KotlinPlugin(
                 val matchedSharp = sharp.containsMatchIn(input = it.message.contentToString())
                 val matchedText = text.containsMatchIn(input = it.message.contentToString())
                 val resultString = rule.replace(it.message.contentToString(),"")
-                if (matchedSharp && matchedText){
-                    println(resultString)
-                    if (time == "0000"){
-                        cache.clear()
-                        FoodCache.save()
-                        FoodCache.reload()
-                        HoiBot.logger.info { "[HoiFood]已清空用户缓存" }
-                    }else{
+                fun getCurrentTimeStamp(): Int {
+                    val times = System.currentTimeMillis()
+                    return (times / 1000).toInt()
+                }
+                if (getCurrentTimeStamp() - TimeCache.time >= TimeCache.delay ){
+                    TimeCache.time = getCurrentTimeStamp()
+                    TimeCache.save()
+                    TimeCache.reload()
+                if (resultString.contains("[动画表情]",ignoreCase = true) || resultString.contains("[图片]",ignoreCase = true)){
+                } else {
+                    if (matchedSharp && matchedText && resultString != "null" && resultString != "") {
                         //map.value 为用户名 map.key 为数值
                         try {
                             cache.forEach { map ->
-                                if (resultString == map.value && resultString != "null") {
+                                if (resultString == map.value) {
                                     it.group.sendMessage("${map.value}今天吃${Food.food[map.key]}")
                                 } else {
                                     code++
                                     if (code == cache.size) {
-                                        if (map.value != resultString && resultString != "null") {
-                                            cache[(0 + 1  until  Food.food.size).random()] = resultString
+                                        if (map.value != resultString) {
+                                            cache[(0 + 1 until Food.food.size).random()] = resultString
                                             FoodCache.save()
                                             FoodCache.reload()
                                             cache.forEach { point ->
                                                 if (resultString == point.value) {
                                                     it.group.sendMessage("${point.value}今天吃${Food.food[point.key]}")
-
                                                 }
                                             }
                                         }
@@ -77,8 +87,9 @@ object HoiBot : KotlinPlugin(
                                     }
                                 }
                             }
-                        }catch (e:Exception){
+                        } catch (e: Exception) {
                             it.group.sendMessage("错误:输入的值不可用")
+                            logger.error(e)
                         }
                     }
                 }
@@ -89,6 +100,7 @@ object HoiBot : KotlinPlugin(
 //                }
 //                if (time == "0000")
             }
+        }
     }
 
     override fun onDisable() {
@@ -96,3 +108,4 @@ object HoiBot : KotlinPlugin(
         CommandRegister().unCommandManager()
     }
 }
+
