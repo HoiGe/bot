@@ -66,31 +66,36 @@ object HoiBot : KotlinPlugin(
                 } else {
                     if (matchedSharp && matchedText && resultString != "null" && resultString != "") {
                         //map.value 为用户名 map.key 为数值
-                        try {
-                            cache.forEach { map ->
-                                if (resultString == map.value) {
-                                    it.group.sendMessage("${map.value}今天吃${Food.food[map.key]}")
-                                } else {
-                                    code++
-                                    if (code == cache.size) {
-                                        if (map.value != resultString) {
-                                            cache[(1 until Food.food.size).random()] = resultString
-                                            FoodCache.save()
-                                            FoodCache.reload()
-                                            cache.forEach { point ->
-                                                if (resultString == point.value) {
-                                                    it.group.sendMessage("${point.value}今天吃${Food.food[point.key]}")
+                        //长度限制为16个字符
+                        if (resultString.length <= 16) {
+                            try {
+                                cache.forEach { map ->
+                                    if (resultString == map.value) {
+                                        it.group.sendMessage("${map.value}今天吃${Food.food[map.key]}")
+                                    } else {
+                                        code++
+                                        if (code == cache.size) {
+                                            if (map.value != resultString) {
+                                                cache[(1 until Food.food.size).random()] = resultString
+                                                FoodCache.save()
+                                                FoodCache.reload()
+                                                cache.forEach { point ->
+                                                    if (resultString == point.value) {
+                                                        it.group.sendMessage("${point.value}今天吃${Food.food[point.key]}")
+                                                    }
                                                 }
                                             }
+                                            code = 0
                                         }
-                                        code = 0
                                     }
                                 }
+                            } catch (e: Exception) {
+                                it.group.sendMessage("错误:输入的值不可用")
+                                logger.error(e)
+                                return@subscribeAlways
                             }
-                        } catch (e: Exception) {
-                            it.group.sendMessage("错误:输入的值不可用")
-                            logger.error(e)
-                            return@subscribeAlways
+                        }else {
+                            it.group.sendMessage("脑子太小，想不过来了:(")
                         }
                     }
                 }
