@@ -1,10 +1,10 @@
 package com.pkgho.hoige.bot.whitelists
 
 import com.pkgho.hoige.bot.HoiBot
+import com.pkgho.hoige.bot.HoiBot.reload
+import com.pkgho.hoige.bot.HoiBot.save
 import com.pkgho.hoige.bot.whitelists.EnableGroup.enableGroups
-import net.mamoe.mirai.console.command.CommandSender
-import net.mamoe.mirai.console.command.CompositeCommand
-import net.mamoe.mirai.console.command.getGroupOrNull
+import net.mamoe.mirai.console.command.*
 
 class CommandHandler {
     object WHL : CompositeCommand(HoiBot, "whl") {
@@ -44,6 +44,32 @@ class CommandHandler {
                 EnableGroup.activeAdmin.forEach {
                     if (it == sender.user?.id) {
                         println(sender.getGroupOrNull()?.id)
+                    }
+                }
+            }
+        }
+        object Enable : SimpleCommand(HoiBot, "add-group") {
+            @Handler
+            suspend fun foo(sender: CommandSender, group: Long) {
+                EnableGroup.activeAdmin.forEach {
+                    if (it == sender.user?.id) {
+                        enableGroups.add(group)
+                        EnableGroup.save()
+                        EnableGroup.reload()
+                        sender.sendMessage("success")
+                    }
+                }
+            }
+        }
+        object Disable : SimpleCommand(HoiBot, "rem-group") {
+            @Handler
+            suspend fun foo(sender: CommandSender, group: Long) {
+                EnableGroup.activeAdmin.forEach {
+                    if (it == sender.user?.id) {
+                        enableGroups.remove(group)
+                        EnableGroup.save()
+                        EnableGroup.reload()
+                        sender.sendMessage("success")
                     }
                 }
             }

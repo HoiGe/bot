@@ -7,7 +7,3 @@ object SteamIDs : AutoSavePluginConfig("steam-ids") {
     //Long GroupID | String SteamUID
     val ids: MutableMap<Long, String> by value()
 }
-
-object Food : AutoSavePluginConfig("foods") {
-    val food: MutableList<String> by value()
-}

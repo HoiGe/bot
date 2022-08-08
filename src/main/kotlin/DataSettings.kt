@@ -2,8 +2,10 @@ package com.pkgho.hoige.bot
 
 import com.pkgho.hoige.bot.HoiBot.reload
 import com.pkgho.hoige.bot.HoiBot.save
+import com.pkgho.hoige.bot.foods.Food
+import com.pkgho.hoige.bot.foods.FoodCache
+import com.pkgho.hoige.bot.foods.TimeCache
 import com.pkgho.hoige.bot.steamuser.SteamIDs
-import com.pkgho.hoige.bot.steamuser.Food
 import com.pkgho.hoige.bot.whitelists.*
 
 object DataSettings {
@@ -14,7 +16,7 @@ object DataSettings {
         EnableGroup.reload()
         SteamIDs.reload()
         TimeCache.reload()
-        FoodCache.cache[1] = "goat"
+        FoodCache.cache["Jeb_"] = (1 until Food.food.size).random()
         FoodCache.save()
         FoodCache.reload()
     }

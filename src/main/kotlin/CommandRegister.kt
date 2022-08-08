@@ -5,6 +5,8 @@ import com.pkgho.hoige.bot.whitelists.CommandHandler
 
 class CommandRegister {
     fun commandManager() {
+        CommandManager.registerCommand(CommandHandler.Disable)
+        CommandManager.registerCommand(CommandHandler.Enable)
         CommandManager.registerCommand(CommandHandler.WHL)
     }
 
