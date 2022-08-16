@@ -65,9 +65,9 @@ object CommandHandler {
             return
             } else {
                 if (cache.isNotEmpty()) {
-                    if (cache.containsKey(rule)) {
+                    if (cache.containsKey(rule) || cache.containsKey(it.sender.id.toString())) {
                         if (rule == "你" && cache.containsKey(it.sender.id.toString())){
-                            it.group.sendMessage("${rule}今天吃${Food.food[cache.getValue(it.sender.id.toString())]}")
+                            it.group.sendMessage("你今天吃${Food.food[cache.getValue(it.sender.id.toString())]}")
                         }else {
                             it.group.sendMessage("${rule}今天吃${Food.food[cache.getValue(rule)]}")
                         }
