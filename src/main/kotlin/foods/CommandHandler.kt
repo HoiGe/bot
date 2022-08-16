@@ -21,30 +21,16 @@ object CommandHandler {
                 val rule = Regex("^#*|今天吃什么*$").replace(input, "")
                 val sharp = Regex("""^#""").containsMatchIn(input)
                 val text = Regex("""今天吃什么$""").containsMatchIn(input)
-                if (getCurrentTimeStamp() - TimeCache.time >= TimeCache.delay && sharp && text && rule != "null" && rule != "") {
+                if (getCurrentTimeStamp() - TimeCache.time >= TimeCache.delay && sharp && text) {
                     TimeCache.time = getCurrentTimeStamp()
                     TimeCache.save()
                     TimeCache.reload()
-                    if (rule.length <= 16) {
-                        if (rule.contains("[动画表情]", ignoreCase = true) || rule.contains("[图片]", ignoreCase = true)) {
-                            return@subscribeAlways
-                        } else {
-                            if (cache.isNotEmpty()) {
-                                if (cache.containsKey(rule)) {
-                                    it.group.sendMessage("${rule}今天吃${Food.food[cache.getValue(rule)]}")
-                                    return@subscribeAlways
-                                } else {
-                                    cache[rule] = (1 until Food.food.size).random()
-                                    FoodCache.save()
-                                    FoodCache.reload()
-                                    it.group.sendMessage("${rule}今天吃${Food.food[cache.getValue(rule)]}")
-                                    return@subscribeAlways
-                                }
-                            }
-                        }
+                    println(rule)
+                    if (rule == "" || rule == "我") {
+                        sendMessage(rule = "你", it = it)
                     } else {
-                        it.group.sendMessage("脑子太小，想不过来了:(")
-                        return@subscribeAlways
+                        sendMessage(rule = rule, it = it)
+                        println(rule)
                     }
                 }
 
@@ -69,4 +55,39 @@ object CommandHandler {
         }
     }
 
+    private suspend fun sendMessage(rule:String, it:GroupMessageEvent) {
+        if (rule.length <= 16 && rule != "null") {
+            if (rule.contains("[动画表情]", ignoreCase = true) || rule.contains(
+                    "[图片]",
+                    ignoreCase = true
+                )
+            ) {
+            return
+            } else {
+                if (cache.isNotEmpty()) {
+                    if (cache.containsKey(rule)) {
+                        if (rule == "你" && cache.containsKey(it.sender.id.toString())){
+                            it.group.sendMessage("${rule}今天吃${Food.food[cache.getValue(it.sender.id.toString())]}")
+                        }else {
+                            it.group.sendMessage("${rule}今天吃${Food.food[cache.getValue(rule)]}")
+                        }
+                    } else {
+                        if (rule == "你"){
+                            cache[it.sender.id.toString()] = (1 until Food.food.size).random()
+                            FoodCache.save()
+                            FoodCache.reload()
+                            it.group.sendMessage("${rule}今天吃${Food.food[cache.getValue(it.sender.id.toString())]}")
+                        }else{
+                            cache[rule] = (1 until Food.food.size).random()
+                            FoodCache.save()
+                            FoodCache.reload()
+                            it.group.sendMessage("${rule}今天吃${Food.food[cache.getValue(rule)]}")
+                        }
+                    }
+                }
+            }
+        } else {
+            it.group.sendMessage("脑子太小，想不过来了:(")
+        }
+    }
 }
