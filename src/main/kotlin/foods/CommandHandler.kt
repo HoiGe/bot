@@ -20,18 +20,19 @@ object CommandHandler {
                 val input = it.message.contentToString()
                 val rule = Regex("^#*|今天吃什么*$").replace(input, "")
                 val gankspace = Regex("\\s").replace(rule, "")
+                val ganksharp = Regex("#").replace(gankspace, "")
                 val sharp = Regex("""^#""").containsMatchIn(input)
                 val text = Regex("""今天吃什么$""").containsMatchIn(input)
                 if (getCurrentTimeStamp() - TimeCache.time >= TimeCache.delay && sharp && text) {
                     TimeCache.time = getCurrentTimeStamp()
                     TimeCache.save()
                     TimeCache.reload()
-                    if (rule == "" || rule == "我") {
-                        sendMessage(rule = "你", it = it)
-                    } else {
-                        sendCustomMessage(rule = gankspace, it = it)
+                        if (rule == "" || rule == "我") {
+                            sendMessage(rule = "你", it = it)
+                        } else {
+                            sendCustomMessage(rule = ganksharp, it = it)
+                        }
                     }
-                }
 
             }
     }
@@ -40,6 +41,7 @@ object CommandHandler {
         val times = System.currentTimeMillis()
         return (times / 1000).toInt()
     }
+
 
     suspend fun getTime() {
         while (true) {
