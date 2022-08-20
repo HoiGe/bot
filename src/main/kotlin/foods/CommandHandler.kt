@@ -19,22 +19,21 @@ object CommandHandler {
             .subscribeAlways<GroupMessageEvent> {
                 val input = it.message.contentToString()
                 val rule = Regex("^#*|今天吃什么*$").replace(input, "")
+                val gankspace = Regex("\\s").replace(rule, "")
                 val sharp = Regex("""^#""").containsMatchIn(input)
                 val text = Regex("""今天吃什么$""").containsMatchIn(input)
                 if (getCurrentTimeStamp() - TimeCache.time >= TimeCache.delay && sharp && text) {
                     TimeCache.time = getCurrentTimeStamp()
                     TimeCache.save()
                     TimeCache.reload()
-                    println(rule)
                     if (rule == "" || rule == "我") {
                         sendMessage(rule = "你", it = it)
                     } else {
-                        sendMessage(rule = rule, it = it)
-                        println(rule)
+                        sendCustomMessage(rule = gankspace, it = it)
                     }
                 }
 
-        }
+            }
     }
 
     private fun getCurrentTimeStamp(): Int {
@@ -43,8 +42,8 @@ object CommandHandler {
     }
 
     suspend fun getTime() {
-        while(true){
-            if (LocalDateTime.now().format(DateTimeFormatter.ofPattern("HHmmss")) == "000000"){
+        while (true) {
+            if (LocalDateTime.now().format(DateTimeFormatter.ofPattern("HHmmss")) == "000000") {
                 HoiBot.logger.info("数据已重置")
                 cache.clear()
                 cache["goat"] = 1
@@ -55,41 +54,35 @@ object CommandHandler {
         }
     }
 
-    private suspend fun sendMessage(rule:String, it:GroupMessageEvent) {
+    private suspend fun sendCustomMessage(rule: String, it: GroupMessageEvent) {
         if (rule.length <= 16 && rule != "null") {
-            if (rule.contains("[动画表情]", ignoreCase = true) || rule.contains(
-                    "[图片]",
-                    ignoreCase = true
-                )
-            ) {
-            return
+            if (rule.contains("[动画表情]", ignoreCase = true) || rule.contains("[图片]", ignoreCase = true)) {
+                return
             } else {
                 if (cache.isNotEmpty()) {
-                    if (cache.containsKey(rule) || cache.containsKey(it.sender.id.toString())) {
-                        if (rule == "你" && cache.containsKey(it.sender.id.toString())){
-                            it.group.sendMessage("你今天吃${Food.food[cache.getValue(it.sender.id.toString())]}")
-                        }else {
-                            if (cache.containsKey(rule)){
-                                it.group.sendMessage("${rule}今天吃${Food.food[cache.getValue(rule)]}")
-                            }
-                        }
+                    if (cache.containsKey(rule)) {
+                        it.group.sendMessage("${rule}今天吃${Food.food[cache.getValue(rule)]}")
                     } else {
-                        if (rule == "你"){
-                            cache[it.sender.id.toString()] = (1 until Food.food.size).random()
-                            FoodCache.save()
-                            FoodCache.reload()
-                            it.group.sendMessage("${rule}今天吃${Food.food[cache.getValue(it.sender.id.toString())]}")
-                        }else{
-                            cache[rule] = (1 until Food.food.size).random()
-                            FoodCache.save()
-                            FoodCache.reload()
-                            it.group.sendMessage("${rule}今天吃${Food.food[cache.getValue(rule)]}")
-                        }
+                        cache[rule] = (1 until Food.food.size).random()
+                        FoodCache.save()
+                        FoodCache.reload()
+                        it.group.sendMessage("${rule}今天吃${Food.food[cache.getValue(rule)]}")
                     }
                 }
             }
-        } else {
-            it.group.sendMessage("脑子太小，想不过来了:(")
+        }
+    }
+
+    private suspend fun sendMessage(rule: String, it: GroupMessageEvent) {
+        if (cache.isNotEmpty()) {
+            if (rule == "你" && cache.containsKey(it.sender.id.toString())) {
+                    it.group.sendMessage("你今天吃${Food.food[cache.getValue(it.sender.id.toString())]}")
+            } else {
+                cache[it.sender.id.toString()] = (1 until Food.food.size).random()
+                FoodCache.save()
+                FoodCache.reload()
+                it.group.sendMessage("${rule}今天吃${Food.food[cache.getValue(it.sender.id.toString())]}")
+            }
         }
     }
 }
