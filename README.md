@@ -9,3 +9,6 @@
 ### 功能主治
 - 血压低
 - 代码洁癖
+### 功能
+- [今天吃什么(已分离)](https://github.com/HoiGe/WhatToEat)
+- 白名单认证(WIP)
